@@ -1,5 +1,6 @@
 CFLAGS += -O2 -Wall
-HIDAPI = hidraw
+HIDAPI = libusb
+#HIDAPI = hidraw
 LDFLAGS += -lhidapi-$(HIDAPI)
 PYTHON_INCLUDE=$(shell python3-config --includes)
 

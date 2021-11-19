@@ -96,7 +96,12 @@ int enumerate_relay_boards(const char *product, int verbose, int debug)
 						 Serial_Length);
 				} else {
 					// The product string is USBRelayx where x is number of relays read to the \0 in case there are more than 9
-					relay_boards[relay].relay_count = atoi((const char *)&cur_dev->product_string[8]);
+					if (cur_dev->product_string != NULL) {
+						relay_boards[relay].relay_count = atoi((const char *)&cur_dev->product_string[8]);
+					} else {
+						// assume 2 if no product_string
+						relay_boards[relay].relay_count = 2;
+					}
 				}
 				//Open it to get more details
 				hid_device *handle;
@@ -366,13 +371,12 @@ static int get_board_features(relay_board * board, hid_device * handle)
 // Function to check if the product is known and return the type
 int known_relay(struct hid_device_info *thisdev)
 {
-	char product[255];
 	if (thisdev == NULL)
 		return 0;
-	sprintf(product, "%ls", thisdev->product_string);
-	if (!strncmp(product, "USBRelay", 8))
+
+	if (thisdev->vendor_id == 0x16c0 && thisdev->product_id == 0x05df)
 		return DCTTECH;
-	if (!strncmp(product, "HIDRelay", 8))
+	if (thisdev->vendor_id == 0x0519 && thisdev->product_id == 0x2018)
 		return UCREATE;
 	return 0;
 }
